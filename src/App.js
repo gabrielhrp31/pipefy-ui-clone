@@ -1,24 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
-
+import GlobalStyles from '../src/styles/globals'
+import Header from './components/Header'
+import Board from "./components/Board";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { TouchBackend } from 'react-dnd-touch-backend'
+import { createTransition } from 'react-dnd-multi-backend';
 function App() {
+  const MouseTransition = createTransition('mousedown', (e) => {
+    return e.type
+      && e.type.indexOf('touch') === -1
+      && e.type.indexOf('mouse') !== -1;
+  });
+
+  const HTML5ToTouch = {
+    backends: [
+      {
+        backend: HTML5Backend,
+      },
+      {
+        backend: TouchBackend({ enableMouseEvents: false }),
+        preview: true,
+        transition: TouchTransition,
+      },
+      {
+        backend: HTML5Backend,
+        transition: MouseTransition,
+      },
+    ],
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <DndProvider backend={HTML5ToTouch} options={backendOptions}>
+        <Header />
+        <Board />
+        <GlobalStyles />
+      </DndProvider>
+    </>
   );
 }
 
